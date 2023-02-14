@@ -14,7 +14,7 @@ private const byte CR = 0x0D; //캐리지 리턴
 ````
 
 #### 1. Serial_lib 인스턴스 생성
-    - data bit, parity bit, stop bit의 파라미터는 아직 미구현. 
+- data bit, parity bit, stop bit의 파라미터는 아직 미구현. 
         추후에 운용자가 자유롭게 모듈내에서 처리 하시길!
 ````C#
 serial = new Serial_lib(comport,rate);
