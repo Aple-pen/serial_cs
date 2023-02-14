@@ -9,17 +9,19 @@ namespace SerialLib
 {
     public delegate void DataGetEventHandler(string data); // 스트링 데이터 델리게이트(콘솔 메세지 용도)
     public delegate void GetReceiveDataHandler(Byte[] data); // 바이트 데이터 델리게이트(데이터 리시브 용도)
+    public delegate void GetReceiveErrorHandler(Exception err); // 에러 델리게이트(데이터 리시브 용도)
     
     public class Serial_lib
     {
-        private const int QUEBUFFSIZE = 2048; //큐버퍼 최대사이즈
-        private const int RECBUFFSIZE = 2048; //리시브 최대사이즈
-        private const byte CR = 0x0D; //캐리지 리턴
+        private const int QUEBUFFSIZE = 5208; //큐버퍼 최대사이즈
+        private const int RECBUFFSIZE = 18; //리시브 최대사이즈
+        private const byte ETX = 0x03; //ETX
         
         private Thread DataReadThread;
         
         public DataGetEventHandler DataSendEvent; //string 데이터 외부로 전달
         public GetReceiveDataHandler GetReceiveByte; //byte 데이터 외부로 전달
+        public GetReceiveErrorHandler GetError; //에러 외부로 전달
         
         private string Comport { get; set; }
         private int Rate { get; set; }
@@ -73,8 +75,8 @@ namespace SerialLib
                     byte r = QueBuff[QueTail];
                     QueTail = (uint)((QueTail + 1) % QUEBUFFSIZE);
                     RecBuff[CompleteIndex] = r;
-                    CompleteIndex++;
-                    if (r == CR) // 데이터의 끝
+                    CompleteIndex = CompleteIndex == QUEBUFFSIZE - 1 ? 0 : CompleteIndex += 1;
+                    if (r == ETX) // 데이터의 끝
                     {
                         GetReceiveByte(RecBuff);
                         RecBuff = new byte[RECBUFFSIZE];
@@ -113,7 +115,7 @@ namespace SerialLib
             }
             catch (Exception err)
             {
-                Debug.WriteLine(err);
+                GetError(err);
             }
             
         }

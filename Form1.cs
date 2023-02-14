@@ -75,6 +75,10 @@ namespace SerialLibrary
             
             serial.DataSendEvent += new DataGetEventHandler(this.Evt); 
             serial.GetReceiveByte += new GetReceiveDataHandler(this.ReceiveByte);
+            serial.GetError += new GetReceiveErrorHandler((Exception err) =>
+            {
+                MessageBox.Show($"문제가 생겼습니다.\n {err.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            });
             
             serial.Connect();
         }
