@@ -10,7 +10,7 @@
 ````c#
 private const int QUEBUFFSIZE = 2048; //큐버퍼 최대사이즈
 private const int RECBUFFSIZE = 2048; //리시브 최대사이즈
-private const byte CR = 0x0D; //캐리지 리턴
+private const byte ETX = 0x0D; //종단 문자
 ````
 
 #### 1. Serial_lib 인스턴스 생성
@@ -23,9 +23,15 @@ serial = new Serial_lib(comport,rate);
 #### 2.데이터 리시브 델리게이트 등록
  - byte 배열 데이터가 완성되어있을때 GetReceiveByte  이벤트가 동작하므로 해당 데이터 처리를 하는 함수를 등록하여 준다.
  - DataSendEvent는 콘솔메세지 전용 델리게이트이므로 등록하지 않아도 무관.
+ - 모듈내에서 에러가 발생 시 GetReceiveErrorHandler 델리게이트로 연동하였음. 해당 이벤트에서 에러처리를 하면 됨.(등록하지 않아도 무관)
+ - 이벤트 등록시 람다식으로 표현 가능(3번째 에러 관련 이벤트)
 ````c#
 serial.DataSendEvent += new DataGetEventHandler(this.Evt); 
 serial.GetReceiveByte += new GetReceiveDataHandler(this.ReceiveByte);
+serial.GetError += new GetReceiveErrorHandler((Exception err) =>
+      {
+          MessageBox.Show($"문제가 생겼습니다.\n {err.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      });
 ````
 
 #### 3. 커넥션 함수 호출
